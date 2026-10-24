@@ -13,7 +13,7 @@ const Navigation = () => {
       //   listStyle: "none",
       // }}
 
-      className=" bg-sky-500 p-6 flex justify-end gap-10 text-lg list-none"
+      className=" bg-sky-500 p-4 font-bold hover:bg-sky-600 flex justify-end gap-10 text-lg list-none"
     >
       <Link href={"/"}>
         <li>Home</li>
@@ -26,6 +26,15 @@ const Navigation = () => {
       </Link>
       <Link href={"/service"}>
         <li>Service</li>
+      </Link>
+      <Link href={"/servercompo"}>
+        <li>Server Component</li>
+      </Link>
+      <Link href={"/clientcompo"}>
+        <li>Client Component</li>
+      </Link>
+      <Link href={"/user/"}>
+        <li>User</li>
       </Link>
     </ul>
   );

@@ -1,2 +1,6 @@
+@import "tailwindcss";
 
-@import "tailwindcss"
+.about_header {
+  color: #e90f0f;
+  background-color: #f6ff00;
+}
