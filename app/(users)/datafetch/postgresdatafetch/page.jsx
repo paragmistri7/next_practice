@@ -1,8 +1,11 @@
 "use client";
+
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const DataFetching = () => {
   const [data, setData] = useState([]);
+  const router = useRouter();
 
   const fetchData = () => {
     try {
@@ -36,13 +39,24 @@ const DataFetching = () => {
                 </span>
               </div>
 
-              <button
-                onClick={fetchData}
-                className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700 active:scale-95"
-              >
-                <span>↻</span>
-                Refresh
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() =>
+                    router.push("/datafetch/postgresdatafetch/add-user")
+                  }
+                  className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700 active:scale-95"
+                >
+                  <span>+</span>
+                  Add User
+                </button>
+                <button
+                  onClick={fetchData}
+                  className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700 active:scale-95"
+                >
+                  <span>↻</span>
+                  Refresh
+                </button>
+              </div>
             </div>
           </caption>
 

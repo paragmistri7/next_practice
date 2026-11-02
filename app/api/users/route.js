@@ -22,3 +22,41 @@ export async function GET(request) {
 
     }
 }
+
+
+// POST API - Insert new user
+export async function POST(request) {
+    try {
+        const body = await request.json();
+
+        const { name, email, phone, age, city } = body;
+
+        const result = await pool.query(
+            `INSERT INTO users (name, email, phone, age, city)
+       VALUES ($1, $2, $3, $4, $5)
+       RETURNING *`,
+            [name, email, phone, age, city]
+        );
+
+        return Response.json(
+            {
+                success: true,
+                message: "User created successfully",
+                data: result.rows[0],
+            },
+            { status: 201 }
+        );
+
+    } catch (error) {
+        console.error("POST User Error:", error);
+
+        return Response.json(
+            {
+                success: false,
+                message: "Failed to create user",
+            },
+            { status: 500 }
+        );
+    }
+}
+
