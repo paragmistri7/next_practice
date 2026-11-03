@@ -11,7 +11,6 @@ const DataFetching = () => {
     try {
       fetch("/api/users")
         .then((response) => {
-          console.log("Response:", response);
           return response.json();
         })
         .then((data) => {
@@ -105,7 +104,11 @@ const DataFetching = () => {
                     <div className="flex items-center justify-center gap-2">
                       {/* Edit Button */}
                       <button
-                        onClick={() => console.log("Edit User:", user)}
+                        onClick={() =>
+                          router.push("/datafetch/postgresdatafetch/add-user", {
+                            state: { user },
+                          })
+                        }
                         className="rounded-lg bg-amber-100 px-3 py-2 text-xs font-semibold text-amber-700 transition hover:bg-amber-200"
                       >
                         ✏️ Edit

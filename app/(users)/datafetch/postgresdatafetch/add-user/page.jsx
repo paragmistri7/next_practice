@@ -46,9 +46,6 @@ const AddUser = () => {
       });
 
       const result = await response.json();
-
-      console.log("Add User Response:", result);
-
       if (!response.ok) {
         throw new Error(result.message || "Failed to add user");
       } else {
