@@ -6,7 +6,7 @@ const ServerCompo = () => {
       <h1>Server Component</h1>
       <button
         className="bg-red-500 text-white p-2 rounded-lg"
-        onClick={() => alert("helloo")}
+        // onClick={() => alert("helloo")}
       >
         Click me
       </button>

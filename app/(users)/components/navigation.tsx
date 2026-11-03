@@ -36,6 +36,9 @@ const Navigation = () => {
       <Link href={"/user/"}>
         <li>User</li>
       </Link>
+      <Link href={"/cache"}>
+        <li>Cache</li>
+      </Link>
       <Link href={"/datafetch/postgresdatafetch"}>
         <li>Data Fetching</li>
       </Link>
