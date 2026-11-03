@@ -1,25 +1,49 @@
 import pool from "@/lib/db";
 
 export async function GET(request) {
-    console.log("Request received:", request);
     try {
-        const result = await pool.query("SELECT * FROM users");
-        console.log("Database Result:", result.rows);
+        const { searchParams } = new URL(request.url);
+
+        const id = searchParams.get("id");
+
+        let query = "SELECT * FROM users";
+        let values = [];
+
+        if (id) {
+            query += " WHERE id = $1";
+            values.push(id);
+        }
+
+        const result = await pool.query(query, values);
+
+        if (id && result.rows.length === 0) {
+            return Response.json(
+                {
+                    success: false,
+                    message: "User not found",
+                },
+                { status: 404 }
+            );
+        }
+
         return Response.json({
             success: true,
-            message: "Users retrieved successfully!",
-            data: result.rows,
+            message: id
+                ? "User retrieved successfully!"
+                : "Users retrieved successfully!",
+            data: id ? result.rows[0] : result.rows,
         });
 
     } catch (error) {
         console.error("Database Error:", error);
-        return Response.json({
-            success: false,
-            message: "Database connection failed",
-        }, {
-            status: 500
-        })
 
+        return Response.json(
+            {
+                success: false,
+                message: "Database connection failed",
+            },
+            { status: 500 }
+        );
     }
 }
 
@@ -72,9 +96,19 @@ export async function POST(request) {
 
 
 // UPDATE USER
-export async function PUT(request, { params }) {
+// UPDATE USER
+export async function PUT(request) {
     try {
-        const { id } = await params;
+        // Get ID from search params
+        const { searchParams } = new URL(request.url);
+        const id = searchParams.get("id");
+
+        if (!id) {
+            return Response.json(
+                { success: false, message: "User ID is required" },
+                { status: 400 }
+            );
+        }
 
         const { name, email, phone, age, city } =
             await request.json();
@@ -93,10 +127,7 @@ export async function PUT(request, { params }) {
 
         if (result.rows.length === 0) {
             return Response.json(
-                {
-                    success: false,
-                    message: "User not found",
-                },
+                { success: false, message: "User not found" },
                 { status: 404 }
             );
         }
@@ -112,10 +143,7 @@ export async function PUT(request, { params }) {
 
         if (error.code === "23505") {
             return Response.json(
-                {
-                    success: false,
-                    message: "Email already exists",
-                },
+                { success: false, message: "Email already exists" },
                 { status: 409 }
             );
         }
@@ -123,7 +151,7 @@ export async function PUT(request, { params }) {
         return Response.json(
             {
                 success: false,
-                message: "Failed to update user",
+                message: error.message,
             },
             { status: 500 }
         );
@@ -133,9 +161,17 @@ export async function PUT(request, { params }) {
 
 
 // DELETE USER
-export async function DELETE(request, { params }) {
+export async function DELETE(request) {
     try {
-        const { id } = await params;
+        const { searchParams } = new URL(request.url);
+        const id = searchParams.get("id");
+
+        if (!id) {
+            return Response.json(
+                { success: false, message: "User ID is required" },
+                { status: 400 }
+            );
+        }
 
         const result = await pool.query(
             `DELETE FROM users

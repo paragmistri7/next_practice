@@ -1,8 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
-const AddUser = () => {
+import React, { useEffect, useState } from "react";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
+const AddUser = (props) => {
+  const { type } = useParams();
+  const searchParams = useSearchParams().get("id");
+  const hasSearchParam = useSearchParams().has("id");
+
   const router = useRouter();
 
   const [formData, setFormData] = useState({
@@ -15,6 +19,23 @@ const AddUser = () => {
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    async function getData() {
+      if (searchParams && type === "edit") {
+        const response = await fetch(`/api/users/?id=${searchParams}`);
+        const { data } = await response.json();
+        setFormData({
+          name: data.name ?? "",
+          email: data.email ?? "",
+          phone: data.phone ?? "",
+          age: data.age ?? "",
+          city: data.city ?? "",
+        });
+      }
+    }
+    getData();
+  }, [searchParams, type]);
 
   // Handle Input Change
   const handleChange = (e) => {
@@ -34,8 +55,13 @@ const AddUser = () => {
       setLoading(true);
       setMessage("");
 
-      const response = await fetch("/api/users", {
-        method: "POST",
+      let url = "/api/users";
+      if (type === "edit" && hasSearchParam) {
+        url = `/api/users/?id=${searchParams}`;
+      }
+
+      const response = await fetch(url, {
+        method: hasSearchParam ? "PUT" : "POST",
         headers: {
           "Content-Type": "application/json",
         },
@@ -47,7 +73,11 @@ const AddUser = () => {
 
       const result = await response.json();
       if (!response.ok) {
-        throw new Error(result.message || "Failed to add user");
+        throw new Error(
+          result.message || hasSearchParam
+            ? "Failed to update user"
+            : "Failed to add user",
+        );
       } else {
         setFormData({
           name: "",
@@ -71,9 +101,13 @@ const AddUser = () => {
       <div className="mx-auto max-w-2xl">
         {/* Heading */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-800">Add New User</h1>
+          <h1 className="text-3xl font-bold text-gray-800">
+            {type === "edit" ? "Edit User Details" : "Add New User"}
+          </h1>
           <p className="mt-2 text-sm text-gray-500">
-            Enter user information to add a new record.
+            {type === "edit"
+              ? "Update the user's information below."
+              : "Enter user information to add a new record."}
           </p>
         </div>
 
@@ -88,7 +122,7 @@ const AddUser = () => {
               <input
                 type="text"
                 name="name"
-                value={formData.name}
+                value={formData.name ?? ""}
                 onChange={handleChange}
                 placeholder="Enter full name"
                 required
@@ -104,7 +138,7 @@ const AddUser = () => {
               <input
                 type="email"
                 name="email"
-                value={formData.email}
+                value={formData.email ?? ""}
                 onChange={handleChange}
                 placeholder="example@gmail.com"
                 required
@@ -121,7 +155,7 @@ const AddUser = () => {
                 <input
                   type="tel"
                   name="phone"
-                  value={formData.phone}
+                  value={formData.phone ?? ""}
                   onChange={handleChange}
                   placeholder="Enter phone number"
                   className="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-800 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
@@ -135,7 +169,7 @@ const AddUser = () => {
                 <input
                   type="number"
                   name="age"
-                  value={formData.age}
+                  value={formData.age ?? ""}
                   onChange={handleChange}
                   placeholder="Enter age"
                   min="1"
@@ -153,7 +187,7 @@ const AddUser = () => {
               <input
                 type="text"
                 name="city"
-                value={formData.city}
+                value={formData.city ?? ""}
                 onChange={handleChange}
                 placeholder="Enter city"
                 className="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-800 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
@@ -177,7 +211,7 @@ const AddUser = () => {
                 disabled={loading}
                 className="flex-1 rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {loading ? "Adding User..." : "Add User"}
+                {type === "edit" ? "Update User" : "Add User"}
               </button>
 
               <button

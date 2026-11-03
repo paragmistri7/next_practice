@@ -7,23 +7,69 @@ const DataFetching = () => {
   const [data, setData] = useState([]);
   const router = useRouter();
 
-  const fetchData = () => {
+  const fetchData = async () => {
+    const response = await fetch("/api/users");
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.message || "Failed to fetch users");
+    }
+
+    return result.data;
+  };
+
+  const refreshData = async () => {
     try {
-      fetch("/api/users")
-        .then((response) => {
-          return response.json();
-        })
-        .then((data) => {
-          setData(data.data);
-        });
+      setData(await fetchData());
     } catch (error) {
       console.error("Failed to fetch users:", error);
     }
   };
 
   useEffect(() => {
-    fetchData();
+    let active = true;
+    fetchData()
+      .then((users) => {
+        if (active) {
+          setData(users);
+        }
+      })
+      .catch((error) => {
+        console.error("Failed to fetch users:", error);
+      });
+
+    return () => {
+      active = false;
+    };
   }, []);
+
+  const deleteUser = async (id) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this user?",
+    );
+
+    if (!confirmDelete) return;
+
+    try {
+      const response = await fetch(`/api/users?id=${id}`, {
+        method: "DELETE",
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message);
+      }
+
+      alert(result.message);
+
+      // Refresh users list
+      await refreshData();
+    } catch (error) {
+      console.error(error);
+      alert(error.message);
+    }
+  };
 
   return (
     <>
@@ -49,7 +95,7 @@ const DataFetching = () => {
                   Add User
                 </button>
                 <button
-                  onClick={fetchData}
+                  onClick={refreshData}
                   className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700 active:scale-95"
                 >
                   <span>↻</span>
@@ -105,9 +151,9 @@ const DataFetching = () => {
                       {/* Edit Button */}
                       <button
                         onClick={() =>
-                          router.push("/datafetch/postgresdatafetch/add-user", {
-                            state: { user },
-                          })
+                          router.push(
+                            `/datafetch/postgresdatafetch/edit?id=${user.id}`,
+                          )
                         }
                         className="rounded-lg bg-amber-100 px-3 py-2 text-xs font-semibold text-amber-700 transition hover:bg-amber-200"
                       >
@@ -116,7 +162,7 @@ const DataFetching = () => {
 
                       {/* Delete Button */}
                       <button
-                        onClick={() => console.log("Delete User:", user.id)}
+                        onClick={() => deleteUser(user.id)}
                         className="rounded-lg bg-red-100 px-3 py-2 text-xs font-semibold text-red-700 transition hover:bg-red-200"
                       >
                         🗑️ Delete
