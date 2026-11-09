@@ -9,12 +9,12 @@ const StaticPageUsers = async () => {
   return (
     <>
       <div>Static Page Content</div>
-      <p>
+      <div>
         Fetched Users:{" "}
         {result.length
           ? result.map((user) => <p key={user.id}>{user.name}</p>)
           : "No users found"}{" "}
-      </p>
+      </div>
       <UserList />
     </>
   );
@@ -25,12 +25,12 @@ const UserList = async () => {
   console.log("<<<<< static page user list >>>>>", result);
 
   return (
-    <p>
+    <div>
       Fetched Users 8999999999900:{" "}
       {result.length
         ? result.map((user) => <p key={user.id}>{user.name}</p>)
         : "No users found"}{" "}
-    </p>
+    </div>
   );
 };
 
