@@ -1,6 +1,7 @@
 "use server";
 
 import pool from "@/lib/db";
+import { redirect } from "next/navigation";
 
 export const contactAction = async (_previousState, formData) => {
     try {
@@ -19,12 +20,17 @@ export const contactAction = async (_previousState, formData) => {
 
         console.log("Inserted Data:", result.rows[0]);
 
-        return {
-            success: true,
-            message: "Contact submitted successfully!"
-        };
+        redirect("/");
+        // revalidatePath("/"); // Revalidate the home page after redirect
+        // return {
+        //     success: true,
+        //     message: "Contact submitted successfully!"
+        // };
 
     } catch (error) {
+        if (error.message === "NEXT_REDIRECT") {
+            throw error; // Rethrow the redirect error to be handled by Next.js
+        }
         console.error("Contact Insert Error:", error);
 
         return {
