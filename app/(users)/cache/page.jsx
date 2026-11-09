@@ -38,7 +38,12 @@ const fetchData = async () => {
   "use cache";
   cacheLife("minutes");
 
-  const response = await fetch(`${process.env.APP_URL}/api/users`);
+  const appUrl = process.env.APP_URL;
+  if (!appUrl) {
+    throw new Error("APP_URL must be set to the absolute URL of this app");
+  }
+
+  const response = await fetch(new URL("/api/users", appUrl));
   if (!response.ok) {
     throw new Error(`Failed to fetch users: ${response.status}`);
   }
