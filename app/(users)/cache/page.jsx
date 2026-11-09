@@ -1,10 +1,9 @@
 import React from "react";
 import { cacheLife } from "next/cache";
+import pool from "@/lib/db";
 
 const StaticPageUsers = async () => {
   const result = await fetchData();
-
-  console.log("<<<<< static page >>>>>", result);
 
   return (
     <>
@@ -22,7 +21,6 @@ const StaticPageUsers = async () => {
 
 const UserList = async () => {
   const result = await fetchData();
-  console.log("<<<<< static page user list >>>>>", result);
 
   return (
     <div>
@@ -38,22 +36,8 @@ const fetchData = async () => {
   "use cache";
   cacheLife("minutes");
 
-  const appUrl = process.env.APP_URL;
-  if (!appUrl) {
-    throw new Error("APP_URL must be set to the absolute URL of this app");
-  }
-
-  const response = await fetch(new URL("/api/users", appUrl));
-  if (!response.ok) {
-    throw new Error(`Failed to fetch users: ${response.status}`);
-  }
-
-  const result = await response.json();
-  if (!result.success) {
-    throw new Error(result.message || "Failed to fetch users");
-  }
-
-  return result.data;
+  const result = await pool.query("SELECT * FROM users");
+  return result.rows;
 };
 
 const StaticPage = () => (
