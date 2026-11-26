@@ -29,6 +29,9 @@ const Navigation = () => {
       <Link href={"/datafetch/postgresdatafetch"}>
         <li>Data Fetching</li>
       </Link>
+      <Link href={"/redux"}>
+        <li>Redux</li>
+      </Link>
     </ul>
   );
 };
